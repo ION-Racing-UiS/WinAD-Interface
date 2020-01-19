@@ -8,7 +8,9 @@ global limiter
 
 
 app = Flask(__name__)
+Bootstrap(app=app)
 app.config.from_object(Config)
+app.config["head_menu"] = ["Home", "User_reg", "Systems", "Terms", "Contact", "Login"]
 limiter = Limiter(app, key_func=get_remote_address, default_limits=["60 per minute", "5 per second"],)
 
 
