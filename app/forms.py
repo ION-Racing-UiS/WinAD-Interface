@@ -16,7 +16,7 @@ class RegisterForm(FlaskForm):
     )
     first_name = StringField(
         'First Name',
-        validators=[validators.Length(min=2, max=32),
+        validators=[validators.Length(min=2, max=32)],
         render_kw={'placerholder': 'First Name'},
         id='fname'
     )
