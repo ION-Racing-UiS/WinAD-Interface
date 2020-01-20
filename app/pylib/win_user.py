@@ -53,8 +53,16 @@ def create_user(user_settings, password):
     Create a Windows Active Directory user with data supplied from a dict and a password.
 
     '''
-    pyad.set_defaults(ldap_server=ldap_server, username=username, password=password)
-    ou_arg = str("OU=" + user_settings["department"] + ",DC=" + userdomain + ",DC=" + domainsuffix)
+    #pyad.set_defaults(ldap_server=ldap_server, username=username, password=password)
+    #ou_arg = str("OU=" + user_settings["department"] + ",DC=" + userdomain + ",DC=" + domainsuffix)
+    dept = user_settings["department"].upper()
+    q = adquery.ADQuery()
+    q.execute_query(
+        attributes=["distinguishedName", "ou"], 
+        where_clause="ou = '{}'".format(dept),
+        base_dn=""
+        )
+    ou_arg = q.get_single_result().get("distinguishedName")
     ou = adcontainer.ADContainer.from_dn(ou_arg)
     name = user_settings["name"]
     user = aduser.ADUser.create(

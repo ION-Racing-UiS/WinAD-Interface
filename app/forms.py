@@ -17,13 +17,13 @@ class RegisterForm(FlaskForm):
     first_name = StringField(
         'First Name',
         validators=[validators.Length(min=2, max=32)],
-        render_kw={'placerholder': 'First Name'},
+        render_kw={'placeholder': 'First Name', 'oninput': 'setUsername()', 'onchange': 'setUsername()'},
         id='fname'
     )
     last_name = StringField(
         'Last Name',
         validators=[validators.Length(min=2, max=32)],
-        render_kw={'placeholder': 'Last Name'},
+        render_kw={'placeholder': 'Last Name', 'oninput': 'setUsername()', 'onchange': 'setUsername()'},
         id='lname'
     )
     full_name = StringField(
