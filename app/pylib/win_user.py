@@ -36,7 +36,7 @@ def create_user_settings(user_input):
         'department': dept,
         'displayName': get_name(fname, lname),
         'givenName': capitalize(fname),
-        'homeDirectory': str(homeProfileDirectoryPrefix + sAMAccountName + homeDirectorySuffix)
+        'homeDirectory': str(homeProfileDirectoryPrefix + sAMAccountName + homeDirectorySuffix),
         'homeDrive': homeDrive,
         'mail': email,
         'name': get_name(fname, lname),
