@@ -1,6 +1,7 @@
 import pywin32_system32
 import win32api
 from pyad import pyad, aduser, adobject, adgroup, addomain, adcontainer, adcomputer, adquery, adsearch
+from ionracing import __init__
 
 ldap_server = "<server_fqdn>" # Fully qualified domain name of the ldap server
 username = "<accountop_username>" # Account operations account
@@ -48,21 +49,21 @@ def create_user_settings(user_input):
         'userPrincipalName': userPrincipalName
     }
 
-def create_user(user_settings, password):
+def create_user(user_settings, password, q):
     '''
     Create a Windows Active Directory user with data supplied from a dict and a password.
 
     '''
-    #pyad.set_defaults(ldap_server=ldap_server, username=username, password=password)
     #ou_arg = str("OU=" + user_settings["department"] + ",DC=" + userdomain + ",DC=" + domainsuffix)
     dept = user_settings["department"].upper()
-    q = adquery.ADQuery()
+    #q = adquery.ADQuery()
     q.execute_query(
         attributes=["distinguishedName", "ou"], 
         where_clause="ou = '{}'".format(dept),
         base_dn=""
         )
     ou_arg = q.get_single_result().get("distinguishedName")
+    pyad.set_defaults(ldap_server=ldap_server, username=username, password=password)
     ou = adcontainer.ADContainer.from_dn(ou_arg)
     name = user_settings["name"]
     user = aduser.ADUser.create(
