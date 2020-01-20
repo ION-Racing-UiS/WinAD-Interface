@@ -55,4 +55,4 @@ class RegisterForm(FlaskForm):
         'Terms',
         validators=[validators.DataRequired('You must agree to the terms and conditions')]
     )
-    submit = SubmitField('Register User')
+    submit = SubmitField('Register User', render_kw={'class': 'btn email-me'})

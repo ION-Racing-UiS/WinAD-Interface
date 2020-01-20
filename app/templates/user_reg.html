@@ -11,27 +11,19 @@
                 <p>This form will make domain user creation easier. All fields is required to make an account.</p>
             </div>
             <form id="user_reg" name="user_reg" method="POST" action="/user_reg/register">
+                {{ form.csrf_token }}
                 <div class="form-group">
                     <div class="col-lg-12">
                         <label class="control-label">
                             <p>Department</p>
                         </label>
-                        <select id="deptSel" name="dept" class="form-control" required="">
-                            <option value="chassis">Chassis</option>
-                            <option value="electronics">Electronics</option>
-                            <option value="it">IT/Computer-Science</option>
-                            <option value="management">Management</option>
-                            <option value="marketing">Marketing</option>
-                            <option value="powertrain">Powertrain</option>
-                            <option value="suspension">Suspension</option>
-                        </select>
+                        {{ wtf.form_field(form.department) }}
                     </div>
                     <div class="col-lg-12">
                         <label class="control-label">
                             <p>Role/Position</p>
                         </label>
-                        <input type="text" name="role" class="form-control" id="role" onchange="setUsername()"
-                            oninput="setUsername()" placeholder="Role or Position" required="">
+                        {{ wtf.form_field(form.role) }}
                     </div>
                 </div>
                 <div class="form-group">
@@ -39,42 +31,41 @@
                         <label class="control-label">
                             <p>First name</p>
                         </label><br />
-                        <input class="col-lg-12 form-control" type="text" name="fname" id="fname"
-                            onchange="setUsername()" oninput="setUsername()" placeholder="First name" required=""><br />
+                        {{ wtf.form_field(form.first_name) }}<br />
                         <label class="control-label">
                             <p>Last name</p>
                         </label><br />
-                        <input class="col-lg-12 form-control" type="text" name="lname" id="lname"
-                            onchange="setUsername()" oninput="setUsername()" placeholder="Last name" required="">
+                        {{ wtf.form_field(form.last_name) }}
                         <label class="control-label">
                             <p>Full name</p>
                         </label><br />
-                        <input class="col-lg-12 form-control" type="text" id="fullname" name="fullname"
-                            placeholder="We'll take care of this one" disabled="">
+                        {{ wtf.form_field(form.user_name) }}
                         <label class="control-label">
                             <p>Username</p>
                         </label><br />
-                        <input class="col-lg-12 form-control" type="text" id="username" name="username"
-                            placeholder="(created by username policy)" disabled="">
+                        {{ wtf.form_field(form.full_name) }}
                         <label class="control-label">
                             <p>Email</p>
                         </label>
-                        <input class="col-lg-12 form-control" type="email" name="email" placeholder="Email" required="">
+                        {{ wtf.form_field(form.email) }}
                         <label class="form-label">
                             <p>Password</p>
                         </label><br />
-                        <input class="col-lg-12 form-control" type="password" name="password"
-                            placeholder="Pick a somwhat secure password" required="">
+                        {{ wtf.form_field(form.password) }}
+                        <label class="form-label"><br />
+                            <p>Confirm Password</p>
+                        </label><br />
+                        {{ wtf.form_field(form.confirm_password) }}
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="col-lg-12">
                         <div class="col-lg-12">
-                            <input type="checkbox" required="">
+                            {{ wtf.form_field(form.terms) }}
                             <span>I agree to the terms & conditions described <a href="/terms" target="_blank">here</a>.
                             </span>
                         </div>
-                        <button class="btn email-me" type="submit">Register</button>
+                        {{ wtf.form_field(form.submit) }}
                     </div>
                 </div>
             </form>
