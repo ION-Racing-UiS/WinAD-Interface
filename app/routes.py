@@ -21,11 +21,11 @@ def user_reg():
     form = RegisterForm()
     if form.is_submitted() and form.validate() and form.submit.data:
         user_data={
-        "deptartment": form.department.data
-        "role": form.role.data
-        "fname": form.first_name.data
-        "lname": form.last_name.data
-        "email": form.email.data
+        "deptartment": form.department.data,
+        "role": form.role.data,
+        "fname": form.first_name.data,
+        "lname": form.last_name.data,
+        "email": form.email.data,
         "passw": form.password.data
         }
         user_settings = win_user.create_user_settings(user_data)
