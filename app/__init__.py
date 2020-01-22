@@ -14,9 +14,8 @@ app.config.from_object(Config)
 app.config["head_menu"] = ["Home", "User_reg", "Systems", "Terms", "Contact", "Login"]
 limiter = Limiter(app, key_func=get_remote_address, default_limits=["60 per minute", "5 per second"],)
 app.config["adquery"] = adquery.ADQuery()
-
-
 csrf = CSRFProtect(app)
+csrf.init_app(app)
 
 
 

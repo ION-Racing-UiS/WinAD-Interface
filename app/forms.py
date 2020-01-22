@@ -1,13 +1,15 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, FormField, TextAreaField, FileField, SelectField, validators
 from wtforms.fields.html5 import DateField
+import app.pylib.win_user
 
-reg_ex = "/^((?!chassis)(?!electronics)(?!it)(?!management)(?!marketing)(?!powertrain)(?!suspension)).*$/igm"
+reg_ex = app.pylib.win_user.ou_regex
+# Regex for different OUs
 
 class RegisterForm(FlaskForm):
     department = SelectField(
         'Department',
-        choices=[('chassis', 'Chassis'), ('electronics', 'Electronics'), ('it', 'IT'), ('management', 'Management'), ('marketing', 'Marketing'), ('powertrain', 'Powertrain'), ('suspension', 'Suspension')],
+        choices=app.pylib.win_user.ous,
         validators=[],
         render_kw={'placeholder': 'Department'}
         )

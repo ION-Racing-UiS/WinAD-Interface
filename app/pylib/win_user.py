@@ -15,6 +15,8 @@ physicalDeliveryOfficeName = "<office_name>" # Office name
 company = "<your_companyname>" # Official Company name
 userdomain = "<yourdomain>" # Just your domain name, ie. google, not google.com
 domainsuffix = "<suffix>" # What top level domain you have, ie. .com, .net, .eu, dk, .no, .se
+ous = [('<ou_name>', '<Ou_name>'), ('<ou_name2>', '<Ou_name2>')] # Organizational units list for the wtf form <type:list> of <type:tuple> or <type:str> and <type:str>
+ou_regex = "/^((?!<ou_name>)(?!<ou_name2>)).*$/igm"# OU regex to match anything else than the ou names
 
 def create_user_settings(user_input):
     '''
@@ -51,8 +53,11 @@ def create_user_settings(user_input):
 
 def create_user(user_settings, password, q):
     '''
-    Create a Windows Active Directory user with data supplied from a dict and a password.
-
+    Create a Windows Active Directory user with data supplied from a dict and password, q is the adquery object.\n
+    Arguments:\n
+    :param user_settings: User settings created by create_user_setting(user_data) <type:dict>\n
+    :param password: Password for the user to be registerd <type:str>\n
+    :param q: ADQuery object to be used for ad queries, add.config[\"adquery\"] <type:pyad.adquery.ADQuery>
     '''
     #ou_arg = str("OU=" + user_settings["department"] + ",DC=" + userdomain + ",DC=" + domainsuffix)
     dept = user_settings["department"].upper()

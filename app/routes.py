@@ -6,12 +6,18 @@ from datetime import datetime
 from app.pylib import win_user
 from pyad import pyad, adcontainer, aduser
 import os
+import time
 
 @app.route("/")
 def landing():
     return render_template("landing.html")
 
-@app.route("/home/")
+@app.route("/r/", methods=["POST"])
+def r():
+    time.sleep(3.2)
+    return url_for("home")
+
+@app.route("/home/", methods=["GET", "POST"])
 def home():
     return render_template("home.html", active=0, head_menu=app.config["head_menu"])
 

@@ -72,13 +72,30 @@
             width: 50%;
         }
     </style>
+    <script type="text/javascript" src="/static/applications/jquery-3.4.1.min.js"></script>
     <script type="text/javascript">
+        var csrf_token = "{{ csrf_token() }}";
 
         function init() {
             document.getElementsByClassName("l-overlay")[0].classList.add("l-overlay-r");
             document.getElementById("logo").classList.add("resize");
             var element = document.getElementById("img-container");
             element.addEventListener("click", function () { redirect(element) });
+            $.ajaxSetup({
+            beforeSend: function(xhr, settings) {
+                if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                    xhr.setRequestHeader("X-CSRFToken", csrf_token);
+                    }
+                }
+            });
+            $.ajax({
+                type: "POST",
+                url: "/r",
+                success: function (resp) {
+                    element.classList.remove("l-overlay-r");
+                    window.location.href = resp;
+                }
+            });
         }
 
         function redirect(e) {
