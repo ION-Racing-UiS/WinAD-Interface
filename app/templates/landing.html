@@ -22,11 +22,11 @@
 
         #img-container>img {
             width: 0px;
-            transition: width 500ms ease-in-out 2000ms, height 500ms ease-in-out 2000ms, background-color 500ms ease-in-out 0;
-            transition-property: width, height, background-color;
-            transition-duration: 500ms, 500ms, 500ms;
+            transition: width 500ms ease-in-out 2000ms, height 500ms ease-in-out 2000ms, background-color 500ms ease-in-out 0, scale(1.0), 2000ms, ease-in-out;
+            transition-property: width, height, background-color, scale(1.0);
+            transition-duration: 500ms, 500ms, 500ms, 2000ms;
             transition-timing-function: ease-in-out;
-            transition-delay: 2000ms, 2000ms, 0ms;
+            transition-delay: 2000ms, 2000ms, 0ms, 250ms;
             position: absolute;
             top: 0;
             left: 0;
@@ -38,6 +38,9 @@
         #img-container>img:hover {
             background-color: rgba(64, 64, 64, .7);
             cursor: pointer;
+            transform: scale(250);
+            transition-timing-function: ease-in-out;
+            transition-duration: 2000ms;
         }
 
         .l-overlay {

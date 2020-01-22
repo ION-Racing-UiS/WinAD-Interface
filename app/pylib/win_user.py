@@ -58,13 +58,13 @@ def create_user(user_settings, password, q):
     dept = user_settings["department"].upper()
     #q = adquery.ADQuery()
     q.execute_query(
-        attributes=["distinguishedName", "ou"], 
+        attributes=["distinguishedName", "ou", "cn"], 
         where_clause="ou = '{}'".format(dept),
         base_dn=""
         )
-    ou_arg = q.get_single_result().get("distinguishedName")
+    #ou_arg = q.get_single_result().get("distinguishedName")
     pyad.set_defaults(ldap_server=ldap_server, username=username, password=password)
-    ou = adcontainer.ADContainer.from_dn(ou_arg)
+    ou = adcontainer.ADContainer.from_dn(q.get_single_result().get("distinguishedName"))
     name = user_settings["name"]
     user = aduser.ADUser.create(
         name=name,

@@ -2,6 +2,8 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, FormField, TextAreaField, FileField, SelectField, validators
 from wtforms.fields.html5 import DateField
 
+reg_ex = "/^((?!chassis)(?!electronics)(?!it)(?!management)(?!marketing)(?!powertrain)(?!suspension)).*$/igm"
+
 class RegisterForm(FlaskForm):
     department = SelectField(
         'Department',
@@ -11,18 +13,18 @@ class RegisterForm(FlaskForm):
         )
     role = StringField(
         'Role',
-        validators=[validators.DataRequired(message='Please input your role.'), validators.Length(min=2)],
+        validators=[validators.DataRequired(message='Please input your role.'), validators.Length(min=2), validators.Regexp(regex=reg_ex, message="Role cannot be equal to a department name.")],
         render_kw={'placeholder': 'Role or posistion'}
     )
     first_name = StringField(
         'First Name',
-        validators=[validators.Length(min=2, max=32)],
+        validators=[validators.Length(min=2, max=32), validators.Regexp(regex=reg_ex, message="First name cannot be equal to a department name.")],
         render_kw={'placeholder': 'First Name', 'oninput': 'setUsername()', 'onchange': 'setUsername()'},
         id='fname'
     )
     last_name = StringField(
         'Last Name',
-        validators=[validators.Length(min=2, max=32)],
+        validators=[validators.Length(min=2, max=32), validators.Regexp(regex=reg_ex, message="Last name cannot be equal to a department name.")],
         render_kw={'placeholder': 'Last Name', 'oninput': 'setUsername()', 'onchange': 'setUsername()'},
         id='lname'
     )
