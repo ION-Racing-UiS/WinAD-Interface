@@ -2,6 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField, FormField, TextAreaField, FileField, SelectField, validators
 from wtforms.fields.html5 import DateField
 import app.pylib.win_user
+import re
 
 reg_ex = app.pylib.win_user.ou_regex
 # Regex for different OUs
@@ -15,7 +16,7 @@ class RegisterForm(FlaskForm):
         )
     role = StringField(
         'Role',
-        validators=[validators.DataRequired(message='Please input your role.'), validators.Length(min=2), validators.Regexp(regex=reg_ex, message="Role cannot be equal to a department name.")],
+        validators=[validators.DataRequired(message='Please input your role.'), validators.Length(min=2), validators.Regexp(regex=reg_ex, flags=re.IGNORECASE, message="Role cannot be equal to a department name.")],
         render_kw={'placeholder': 'Role or posistion'}
     )
     first_name = StringField(
