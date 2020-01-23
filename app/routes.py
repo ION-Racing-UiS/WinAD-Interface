@@ -27,7 +27,7 @@ def user_reg():
     form = RegisterForm()
     if form.is_submitted() and form.validate() and form.submit.data:
         user_data={
-        "deptartment": form.department.data,
+        "department": form.department.data,
         "role": form.role.data,
         "fname": form.first_name.data,
         "lname": form.last_name.data,
