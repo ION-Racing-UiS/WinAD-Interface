@@ -17,7 +17,6 @@ company = "<your_companyname>" # Official Company name
 userdomain = "<yourdomain>" # Just your domain name, ie. google, not google.com
 domainsuffix = "<suffix>" # What top level domain you have, ie. .com, .net, .eu, dk, .no, .se
 ous = [('<ou_name>', '<Ou_name>'), ('<ou_name2>', '<Ou_name2>')] # Organizational units list for the wtf form <type:list> of <type:tuple> or <type:str> and <type:str>
-ou_regex = re.compile()"^((?!<ou_name>)(?!<ou_name2>)).*$")# OU regex to match anything else than the ou names
 
 def create_user_settings(user_input):
     '''
