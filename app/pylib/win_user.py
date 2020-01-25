@@ -1,7 +1,7 @@
 import pywin32_system32
 import win32api
 from pyad import pyad, aduser, adobject, adgroup, addomain, adcontainer, adcomputer, adquery, adsearch
-from ionracing import __init__
+import os
 import re
 
 ldap_server = "<server_fqdn>" # Fully qualified domain name of the ldap server
@@ -120,3 +120,31 @@ def get_name(first_name, last_name):
     :param last_name:  last name  <type:str>
     '''
     return str(capitalize(first_name) + " " + capitalize(last_name))
+
+def get_last_index_of(string, charachter=" "):
+    for i in range(len(string)-1, 0, -1):
+        if string[i] == " ":
+            return i
+    else:
+        return None
+
+def split_name(name, index):
+    return name[:index], name[index + 1:]
+    
+
+if __name__=="__main__":
+    if len(os.sys.argv) == 6:
+        user_data = {
+            'name': os.sys.argv[1],
+            'passw': os.sys.argv[2],
+            'department': os.sys.argv[3],
+            'role': os.sys.argv[4],
+            'email': os.sys.argv[5]
+        }
+        user_data['fname'], user_data['lname'] = split_name(user_data['name'], get_last_index_of(user_data['name'], charachter=" "))
+        user_settings = create_user_settings(user_data)
+        print(str(user_data))
+        print(str(user_settings))
+    else:
+        print("Usage: win_user.py \"First_name Last_name\" \"Password\" \"Department\" \"Role\" \"Mail\"")
+

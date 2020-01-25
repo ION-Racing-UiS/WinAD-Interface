@@ -35,7 +35,7 @@ def user_reg():
         "passw": form.password.data
         }
         user_settings = win_user.create_user_settings(user_data)
-        user = win_user.create_user(user_settings, user_data["passw"], app.config["adquery"])
+        os.system("python \"<path_script>\" \"" + user_setting['cn'] + "\" \"" + user_data['passw'] + "\" \"" + user_data['department'] + "\" \"" + user_data['role'] + "\" \"" + user_data['email'] + "\"")
         msg = user_data["fname"] + ", your user account: " + user_settings["sAMAccountName"] + " should be created. If not please contact the system administrator."
         return render_template("regRes.html", active=1, head_menu=app.config["head_menu"], title="Succes", msg=msg)
     else:
