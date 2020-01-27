@@ -3,6 +3,7 @@ import win32api
 from pyad import pyad, aduser, adobject, adgroup, addomain, adcontainer, adcomputer, adquery, adsearch
 import os
 import re
+from pathlib import Path
 
 ldap_server = "<server_fqdn>" # Fully qualified domain name of the ldap server
 username = "<accountop_username>" # Account operations account
@@ -17,6 +18,7 @@ company = "<your_companyname>" # Official Company name
 userdomain = "<yourdomain>" # Just your domain name, ie. google, not google.com
 domainsuffix = "<suffix>" # What top level domain you have, ie. .com, .net, .eu, dk, .no, .se
 ous = [('<ou_name>', '<Ou_name>'), ('<ou_name2>', '<Ou_name2>')] # Organizational units list for the wtf form <type:list> of <type:tuple> or <type:str> and <type:str>
+path = str(Path(__file__).absolute()) # Absolute path to this file within the filesystem.
 
 def create_user_settings(user_input):
     '''
@@ -35,7 +37,6 @@ def create_user_settings(user_input):
     sAMAccountName = get_username(fname, lname)
     userPrincipalName = get_userPrincipalName(sAMAccountName)
     return {
-        'cn': get_name(fname, lname),
         'department': dept,
         'description': role,
         'displayName': get_name(fname, lname),
@@ -43,15 +44,13 @@ def create_user_settings(user_input):
         'homeDirectory': str(homeProfileDirectoryPrefix + sAMAccountName + homeDirectorySuffix),
         'homeDrive': homeDrive,
         'mail': email,
-        'name': get_name(fname, lname),
         'physicalDeliveryOfficeName': physicalDeliveryOfficeName,
         'profilePath': str(homeProfileDirectoryPrefix + sAMAccountName),
-        'sAMAccountName': sAMAccountName,
         'sn': lname,
         'scriptPath': scriptPath,
-        'userAccountControl': 66048,
-        'userPrincipalName': userPrincipalName
-    }
+        'userPrincipalName': userPrincipalName,
+        'sAMAccountName': sAMAccountName,
+    } # 'cn' and 'name' keys have been removed as they cause exceptions when being updated.
 
 def create_user(user_settings, password, q):
     '''
@@ -124,6 +123,13 @@ def get_name(first_name, last_name):
     return str(capitalize(first_name) + " " + capitalize(last_name))
 
 def get_last_index_of(string, charachter=" "):
+    '''
+    Returns the last index of a specific charachter by looping backwards through a string.\n
+    Arguments:\n
+    :param string: string that you want to find the index in <type:str>\n
+    :param charachter: the charachter you you want to find the last index of <type:chr|str>
+
+    '''
     for i in range(len(string)-1, 0, -1):
         if string[i] == " ":
             return i
@@ -131,11 +137,19 @@ def get_last_index_of(string, charachter=" "):
         return None
 
 def split_name(name, index):
+    '''
+    Returns a tupple of two strings by splitting the string at a given index.
+    I.e split_name(\"Alex Lifeson\", 4) will return (\"Alex\", \"Lifeson\")\n
+    Arguments:\n
+    :param name: Name or string to split at the given index <type:str>\n
+    :param index: Index of where to split <name> at <type:int>
+    '''
     return name[:index], name[index + 1:]
     
 
 if __name__=="__main__":
     if len(os.sys.argv) == 6:
+        pyad.set_defaults(ldap_server=ldap_server, username=username, password=password)
         user_data = {
             'name': os.sys.argv[1],
             'passw': os.sys.argv[2],
@@ -143,11 +157,20 @@ if __name__=="__main__":
             'role': os.sys.argv[4],
             'email': os.sys.argv[5]
         }
+        print(user_data['name'])
         user_data['fname'], user_data['lname'] = split_name(user_data['name'], get_last_index_of(user_data['name'], charachter=" "))
         user_settings = create_user_settings(user_data)
-        ou = adcontainer.ADContainer.from_dn("OU=" + user_data["department"].upper() + ",DC=" + userdomain + ",DC=" + domainsuffix)
-        user = aduser.ADUser.create(user_settings["sAMAccountName"], ou, user_data["passw"])
+        sAMAccountName = get_username(user_data['fname'], user_data['lname'])
+        ou = adcontainer.ADContainer.from_dn(str("OU=" + user_data["department"].upper() + ", DC=" + userdomain.upper() + ", DC=" + domainsuffix.upper()))
+        print(str(ou))
+        user = aduser.ADUser.create(sAMAccountName, ou, user_data["passw"])
+        user = aduser.ADUser.from_cn(sAMAccountName)
+        group = adgroup.ADGroup.from_cn(local_admins)
+        group.add_members([user])
+        print(str(user))
+        user.set_user_account_control_setting("DONT_EXPIRE_PASSWD", True)
         for key in user_settings.keys():
+            print(str(key))
             user.update_attribute(str(key), str(user_settings[key]))
         print(str(user_data))
         print(str(user_settings))

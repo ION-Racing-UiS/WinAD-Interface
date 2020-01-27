@@ -12,18 +12,18 @@ class RegisterForm(FlaskForm):
         )
     role = StringField(
         'Role',
-        validators=[validators.DataRequired(message='Please input your role.'), validators.Length(min=2) )]
+        validators=[validators.DataRequired(message='Please input your role.'), validators.Length(min=2)],
         render_kw={'placeholder': 'Role or posistion'}
     )
     first_name = StringField(
         'First Name',
-        validators=[validators.Length(min=2, max=32) )]
+        validators=[validators.Length(min=2, max=32), validators.DataRequired(message="Please enter your first name.")],
         render_kw={'placeholder': 'First Name', 'oninput': 'setUsername()', 'onchange': 'setUsername()'},
         id='fname'
     )
     last_name = StringField(
         'Last Name',
-        validators=[validators.Length(min=2, max=32) )]
+        validators=[validators.Length(min=2, max=32), validators.DataRequired(message="Please enter your last name.")],
         render_kw={'placeholder': 'Last Name', 'oninput': 'setUsername()', 'onchange': 'setUsername()'},
         id='lname'
     )
