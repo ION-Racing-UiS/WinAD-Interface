@@ -37,6 +37,7 @@ def create_user_settings(user_input):
     return {
         'cn': get_name(fname, lname),
         'department': dept,
+        'description': role,
         'displayName': get_name(fname, lname),
         'givenName': capitalize(fname),
         'homeDirectory': str(homeProfileDirectoryPrefix + sAMAccountName + homeDirectorySuffix),
@@ -47,6 +48,7 @@ def create_user_settings(user_input):
         'profilePath': str(homeProfileDirectoryPrefix + sAMAccountName),
         'sAMAccountName': sAMAccountName,
         'sn': lname,
+        'scriptPath': scriptPath,
         'userAccountControl': 66048,
         'userPrincipalName': userPrincipalName
     }
@@ -143,6 +145,10 @@ if __name__=="__main__":
         }
         user_data['fname'], user_data['lname'] = split_name(user_data['name'], get_last_index_of(user_data['name'], charachter=" "))
         user_settings = create_user_settings(user_data)
+        ou = adcontainer.ADContainer.from_dn("OU=" + user_data["department"].upper() + ",DC=" + userdomain + ",DC=" + domainsuffix)
+        user = aduser.ADUser.create(user_settings["sAMAccountName"], ou, user_data["passw"])
+        for key in user_settings.keys():
+            user.update_attribute(str(key), str(user_settings[key]))
         print(str(user_data))
         print(str(user_settings))
     else:
