@@ -10,7 +10,6 @@
 * Context: Error 500 when trying to connect to the webserver
 * Problem: According to forums this is due to missing permissions for the IIS user account.
 * Solution: Create new user account for IIS or user existing one to set the right permissions
-
 * Context: Portnumbers for different services running on the server
 * Problem: Portnumber 80, 443 and 3306 are blocked firewall or access control lists
 * Solution: Have to contact Theodor Ivesdal about this at a later stage.
