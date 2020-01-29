@@ -36,6 +36,13 @@ def user_reg():
         }
         user_settings = win_user.create_user_settings(user_data)
         os.system("python \"<path_script>\" \"" + user_settings['sAMAccountName'] + "\" \"" + user_data['passw'] + "\" \"" + user_data['department'] + "\" \"" + user_data['role'] + "\" \"" + user_data['email'] + "\"")
+        time.sleep(3.0)
+        try:
+            print("User:\t" + str(aduser.ADUser.from_cn(user_settings['sAMAccountName'])))
+        except:
+            print("Unable to get user from AD")
+        win_user.update_attributes(user_settings['sAMAccountName'], user_settings, user_data['passw'])
+        win_user.join_group(user_settings['sAMAccountName'])
         msg = user_data["fname"] + ", your user account: " + user_settings["sAMAccountName"] + " should be created. If not please contact the system administrator."
         return render_template("regRes.html", active=1, head_menu=app.config["head_menu"], title="Succes", msg=msg)
     else:

@@ -53,7 +53,7 @@ def create_user_settings(user_input):
         'sAMAccountName': sAMAccountName,
     } # 'cn' and 'name' keys have been removed as they cause exceptions when being updated.
 
-def create_user(user_settings, password, q):
+def create_user(user_settings, password, q): # Deprecated function
     '''
     Create a Windows Active Directory user with data supplied from a dict and password, q is the adquery object.\n
     Arguments:\n
@@ -61,15 +61,15 @@ def create_user(user_settings, password, q):
     :param password: Password for the user to be registerd <type:str>\n
     :param q: ADQuery object to be used for ad queries, add.config[\"adquery\"] <type:pyad.adquery.ADQuery>
     '''
-    #ou_arg = str("OU=" + user_settings["department"] + ",DC=" + userdomain + ",DC=" + domainsuffix)
+    '''ou_arg = str("OU=" + user_settings["department"] + ",DC=" + userdomain + ",DC=" + domainsuffix)
     dept = user_settings["department"].upper()
-    #q = adquery.ADQuery()
+    q = adquery.ADQuery()
     q.execute_query(
         attributes=["distinguishedName", "ou", "cn"], 
         where_clause="ou = '{}'".format(dept),
         base_dn=""
         )
-    #ou_arg = q.get_single_result().get("distinguishedName")
+    ou_arg = q.get_single_result().get("distinguishedName")
     pyad.set_defaults(ldap_server=ldap_server, username=username, password=password)
     ou = adcontainer.ADContainer.from_cn(q.get_single_result().get("cn"))
     name = user_settings["name"]
@@ -79,7 +79,66 @@ def create_user(user_settings, password, q):
         password=password,
         optional_attributes=user_settings
     )
-    return user
+    return user'''
+
+def update_attributes(sAMAccountName, user_settings, password=None):
+    '''
+    Sets password for a user password if given.
+    Set/update attributes of a selected user <sAMAccountName>, 
+    given a dict of ldap attributes with values.
+    Returns a list of the set attributes\n
+    Arguments:\n
+    :param aAMAccountName: Username as in sAMAccountName <type:str>\n
+    :param user_settings: Dict of the usersettings <type:dict(str:str)>\n
+    :param password: Password to set for the user <type:str>
+    '''
+    try:
+        if (sAMAccountName is None or type(sAMAccountName) is not str) and (user_settings is None or type(user_settings) is not dict):
+            return ["No or incorrect sAMAccountName and user_settings given: sAMAccountName: " + str(sAMAccountName) + ", user_settings: " + str(user_settings)]
+        elif sAMAccountName is None or type(sAMAccountName) is not str:
+            return ["No or incorrect sAMAccountName given, got: "  + str(sAMAccountName)]
+        elif user_settings is None or type(user_settings) is not dict:
+            return ["No or incorrect user_settings given, got: " + str(user_settings)]
+    except:
+        return str(["An error occoured when trying to check input"])
+    print("Input arguments are of valid types")
+    user = aduser.ADUser.from_cn(str(sAMAccountName))
+    if type(password) is str and password is not None:
+        user.set_password(password)
+    user.set_user_account_control_setting("DONT_EXPIRE_PASSWD", True)
+    for key in user_settings.keys():
+        print(str(key))
+        user.update_attribute(str(key), str(user_settings[key]))
+    set_attributes = []
+    for key in user_settings.keys():
+        set_attributes.append(str(str(key) + ": " + str(user.get_attribute(str(key)))))
+    return set_attributes
+
+def join_group(sAMAccountName, group_cn=local_admins):
+    '''
+    Joins user <sAMAccountName> to a given <group_cn> and returns what groups 
+    the user belongs to.\n
+    Arguments:\n
+    :param sAMAccountName: Username as is sAMAccountName <type:str>\n
+    :param group_cn: Common Name of the group you want the user added to <type:str>
+    '''
+    try:
+        if (sAMAccountName is None or type(sAMAccountName) is not str) and (group_cn is None or type(group_cn) is not dict):
+            return ["No or incorrect sAMAccountName and group_cn given: sAMAccountName: " + str(sAMAccountName) + ", group_cn: " + str(group_cn)]
+        elif sAMAccountName is None or type(sAMAccountName) is not str:
+            return ["No or incorrect sAMAccountName given, got: "  + str(sAMAccountName)]
+        elif group_cn is None or type(group_cn) is not dict:
+            return ["No or incorrect group_cn given, got: " + str(group_cn)]
+    except:
+        return str(["An error occoured when trying to check input"])
+    print("Input arguments are of valid types")
+    user = aduser.ADUser.from_cn(sAMAccountName)
+    group = adgroup.ADGroup.from_cn(group_cn)
+    group.add_members([user])
+    user_groups = []
+    for group in sorted(user.get_attribute('memberOf')):
+        user_groups.append(str(adgroup.ADGroup.from_dn(str(group)).cn))
+    return user_groups
     
 def get_username(first_name, last_name):
     '''

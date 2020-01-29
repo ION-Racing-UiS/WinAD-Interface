@@ -32,6 +32,6 @@
         * Problem: Exception is thrown when using the result of the query to get OU with the correct 'distinguishedName'
         * Solution: Optimize subshell implementation run (maybe) run properly
             * Context: User registration does not function properly (Running from IIS server)
-            * Problem: User is registered, but not with any attibutes
-            * Solution: Try different webserver i.e. apache or running (any adice???). May possibly run the user registration in a different server on a seperate process?
+            * Problem: User is registered, but not with any attibutes (only username and ou, no password)
+            * Solution: ~Try different webserver i.e. apache or running (any adice???). May possibly run the user registration in a different server on a seperate process?~ Use a hybrid solution where user is created with the subshell command, and the rest is handeled by `win_user.update_attributes()` and `win_user.join_group()`.
 
