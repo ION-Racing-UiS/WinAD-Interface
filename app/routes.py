@@ -35,7 +35,7 @@ def user_reg():
         "passw": form.password.data
         }
         user_settings = win_user.create_user_settings(user_data)
-        os.system("python \"<path_script>\" \"" + user_settings['sAMAccountName'] + "\" \"" + user_data['passw'] + "\" \"" + user_data['department'] + "\" \"" + user_data['role'] + "\" \"" + user_data['email'] + "\"")
+        os.system("python \"<path_script>\" \"" + user_data["fname"] + " " + user_data["lname"] + "\" \"" + user_data['passw'] + "\" \"" + user_data['department'] + "\" \"" + user_data['role'] + "\" \"" + user_data['email'] + "\"")
         time.sleep(3.0)
         try:
             print("User:\t" + str(aduser.ADUser.from_cn(user_settings['sAMAccountName'])))
@@ -47,3 +47,4 @@ def user_reg():
         return render_template("regRes.html", active=1, head_menu=app.config["head_menu"], title="Succes", msg=msg)
     else:
         return render_template("user_reg.html", active=1, head_menu=app.config["head_menu"], form=form)
+
