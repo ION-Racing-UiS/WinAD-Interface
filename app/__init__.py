@@ -7,6 +7,7 @@ from flask_limiter.util import get_remote_address
 from pyad import pyad, aduser, adobject, adgroup, addomain, adcontainer, adcomputer, adquery, adsearch
 import datetime
 import sys
+import os
 global limiter
 
 
@@ -31,11 +32,12 @@ if len(str(today.day)) < 2:
 else:
     day = str(today.day)
 log_name = "u_ex" + year + month + day+".txt"
-print(log_name)
+#print(str(Path(__file__) + "__logs__\\")
+filename = str(os.path.abspath(os.getcwd())) + "\\app\\__logs__\\" + log_name
 try:
-    sys.stdout = open("../../logs/LogFiles/WCSVC1/"+log_name, 'a')
+    sys.stdout = open(filename, 'a')
 except:
-    sys.stdout = open("../../logs/LogFiles/WCSVC1/"+log_name, 'w')
+    sys.stdout = open(filename, 'w+')
 print("Starting flask server")
 
 
