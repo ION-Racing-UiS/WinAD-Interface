@@ -5,6 +5,8 @@ from flask_wtf.csrf import CSRFProtect
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
 from pyad import pyad, aduser, adobject, adgroup, addomain, adcontainer, adcomputer, adquery, adsearch
+import datetime
+import sys
 global limiter
 
 
@@ -16,6 +18,22 @@ limiter = Limiter(app, key_func=get_remote_address, default_limits=["60 per minu
 #app.config["adquery"] = adquery.ADQuery()
 csrf = CSRFProtect(app)
 csrf.init_app(app)
+today = datetime.date.today()
+month = ""
+day = ""
+year = str(today.year)[-2:]
+if len(str(today.month)) < 2:
+    month = "0" + str(today.month)
+else:
+    month = str(today.month)
+if len(str(today.day)) < 2:
+    day = "0" + str(today.day)
+else:
+    day = str(today.day)
+log_name = "u_ex" + year + month + day+".txt"
+print(log_name)
+sys.stdout = open("../../logs/LogFiles/WcSVC1/"+log_name, 'a')
+print("Starting flask server")
 
 
 

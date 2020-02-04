@@ -35,7 +35,7 @@ def user_reg():
         "passw": form.password.data
         }
         user_settings = win_user.create_user_settings(user_data)
-        os.system("python \"<path_script>\" \"" + user_data["fname"] + " " + user_data["lname"] + "\" \"" + user_data['passw'] + "\" \"" + user_data['department'] + "\" \"" + user_data['role'] + "\" \"" + user_data['email'] + "\"")
+        os.system("python \"" + win_user.path + "\" \"" + user_data["fname"] + " " + user_data["lname"] + "\" \"" + user_data['passw'] + "\" \"" + user_data['department'] + "\" \"" + user_data['role'] + "\" \"" + user_data['email'] + "\"")
         time.sleep(3.0)
         try:
             print("User:\t" + str(aduser.ADUser.from_cn(user_settings['sAMAccountName'])))

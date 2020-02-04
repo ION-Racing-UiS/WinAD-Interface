@@ -33,5 +33,11 @@
         * Solution: Optimize subshell implementation run (maybe) run properly
             * Context: User registration does not function properly (Running from IIS server)
             * Problem: User is registered, but not with any attibutes (only username and ou, no password)
-            * Solution: ~Try different webserver i.e. apache or running (any adice???). May possibly run the user registration in a different server on a seperate process?~ Use a hybrid solution where user is created with the subshell command, and the rest is handeled by `win_user.update_attributes()` and `win_user.join_group()`.
+            * Solution: ~Try different webserver i.e. apache or running (any advice???). May possibly run the user registration in a different server on a seperate process?~ Use a hybrid solution where user is created with the subshell command, and the rest is handeled by `win_user.update_attributes()` and `win_user.join_group()`.
+                * Context: User is registred, but not with any attributes.
+                * Problem: An `CoInitialize` not called exception is thrown
+                * Solution: Import pythoncom and call `CoInitialize()`
+                    * Context: User is registerd, but not with any attributes.
+                    * Problem: Error 500 when creating user from IIS app
+                    * Solution: Create helper process i.e. reg service
 
