@@ -32,7 +32,10 @@ else:
     day = str(today.day)
 log_name = "u_ex" + year + month + day+".txt"
 print(log_name)
-sys.stdout = open("../../logs/LogFiles/WcSVC1/"+log_name, 'a')
+try:
+    sys.stdout = open("../../logs/LogFiles/WCSVC1/"+log_name, 'a')
+except:
+    sys.stdout = open("../../logs/LogFiles/WCSVC1/"+log_name, 'w')
 print("Starting flask server")
 
 
