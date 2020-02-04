@@ -7,5 +7,7 @@ app/__pycache__/
 app/__pycache__/*
 app\__pycache__\
 app\__pycache__\*.pyc
+app/__logs__/*.*
+app\__logs__\*.*
 app/__logs__/*
 app\__logs__\*
