@@ -53,33 +53,33 @@ def create_user_settings(user_input):
         'sAMAccountName': sAMAccountName,
     } # 'cn' and 'name' keys have been removed as they cause exceptions when being updated.
 
-def create_user(user_settings, password, q): # Deprecated function
+def create_user(user_settings, password): # Deprecated function
     '''
     Create a Windows Active Directory user with data supplied from a dict and password, q is the adquery object.\n
     Arguments:\n
     :param user_settings: User settings created by create_user_setting(user_data) <type:dict>\n
-    :param password: Password for the user to be registerd <type:str>\n
-    :param q: ADQuery object to be used for ad queries, add.config[\"adquery\"] <type:pyad.adquery.ADQuery>
+    :param password: Password for the user to be registerd <type:str>
     '''
-    '''ou_arg = str("OU=" + user_settings["department"] + ",DC=" + userdomain + ",DC=" + domainsuffix)
+    ou_arg = str("OU=" + user_settings["department"] + ",DC=" + userdomain + ",DC=" + domainsuffix)
     dept = user_settings["department"].upper()
-    q = adquery.ADQuery()
+    '''q = adquery.ADQuery()
     q.execute_query(
         attributes=["distinguishedName", "ou", "cn"], 
         where_clause="ou = '{}'".format(dept),
         base_dn=""
         )
-    ou_arg = q.get_single_result().get("distinguishedName")
+    ou_arg = q.get_single_result().get("distinguishedName")'''
     pyad.set_defaults(ldap_server=ldap_server, username=username, password=password)
-    ou = adcontainer.ADContainer.from_cn(q.get_single_result().get("cn"))
-    name = user_settings["name"]
+    ou = adcontainer.ADContainer.from_dn(ou_arg)
+    name = user_settings["sAMAccountName"]
     user = aduser.ADUser.create(
-        name=name,
-        container_object=ou,
-        password=password,
-        optional_attributes=user_settings
+        name,
+        ou,
+        password,
+        user_settings
     )
-    return user'''
+    user.set_user_account_control_setting("DONT_EXPIRE_PASSWD", True)
+    return user
 
 def update_attributes(sAMAccountName, user_settings, password=None):
     '''
@@ -105,6 +105,7 @@ def update_attributes(sAMAccountName, user_settings, password=None):
     user = aduser.ADUser.from_cn(str(sAMAccountName))
     if type(password) is str and password is not None:
         user.set_password(password)
+        #pyad.set_defaults(ldap_server=ldap_server, username=sAMAccountName, password=password)
     user.set_user_account_control_setting("DONT_EXPIRE_PASSWD", True)
     for key in user_settings.keys():
         print(str(key))
@@ -112,6 +113,7 @@ def update_attributes(sAMAccountName, user_settings, password=None):
     set_attributes = []
     for key in user_settings.keys():
         set_attributes.append(str(str(key) + ": " + str(user.get_attribute(str(key)))))
+    #pyad.set_defaults(ldap_server=ldap_server, username=username, password=password)
     return set_attributes
 
 def join_group(sAMAccountName, group_cn=local_admins):
@@ -234,6 +236,19 @@ if __name__=="__main__":
             user.update_attribute(str(key), str(user_settings[key]))
         print(str(user_data))
         print(str(user_settings))
+    elif len(os.sys.argv) == 3:
+        # Simpler version to create a user account with only 2 arguments (Username and department)
+        pyad.set_defaults(ldap_server=ldap_server, username=username, password=None)
+        name = os.sys.argv[1]
+        fname, lname = split_name(name, get_last_index_of(name, charachter=" "))
+        sAMAccountName = get_username(fname, lname)
+        department = os.sys.argv[2]
+        ou = adcontainer.ADContainer.from_dn(str("OU=" + department.upper() + ",DC=" + userdomain.upper() + ",DC=" + domainsuffix.upper()))
+        print(str(ou))
+        user = aduser.ADUser.create(sAMAccountName, ou, None)
+        print(str(user))
+        group = adgroup.ADGroup.from_cn(local_admins)
+        group.add_members([user])
     else:
-        print("Usage: win_user.py \"First_name Last_name\" \"Password\" \"Department\" \"Role\" \"Mail\"")
+        print("Usage: win_user.py \"First_name Last_name\" \"Password\" \"Department\" \"Role\" \"Mail\"\nOr: win_user.py \"First_name Last_name\" \"Department\"")
 

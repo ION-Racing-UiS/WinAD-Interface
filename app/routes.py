@@ -4,9 +4,10 @@ from app import app, limiter
 from app.forms import RegisterForm
 from datetime import datetime
 from app.pylib import win_user
-from pyad import pyad, adcontainer, aduser
+from pyad import pyad, adcontainer, aduser, adgroup, adobject
 import os
 import time
+import pythoncom
 
 @app.route("/")
 def landing():
@@ -26,6 +27,7 @@ def home():
 def user_reg():
     form = RegisterForm()
     if form.is_submitted() and form.validate() and form.submit.data:
+        pythoncom.CoInitialize()
         user_data={
         "department": form.department.data,
         "role": form.role.data,
@@ -35,7 +37,9 @@ def user_reg():
         "passw": form.password.data
         }
         user_settings = win_user.create_user_settings(user_data)
-        os.system("python \"" + win_user.path + "\" \"" + user_data["fname"] + " " + user_data["lname"] + "\" \"" + user_data['passw'] + "\" \"" + user_data['department'] + "\" \"" + user_data['role'] + "\" \"" + user_data['email'] + "\"")
+        #os.system("python \"" + win_user.path + "\" \"" + user_data["fname"] + " " + user_data["lname"] + "\" \"" + user_data['passw'] + "\" \"" + user_data['department'] + "\" \"" + user_data['role'] + "\" \"" + user_data['email'] + "\"")
+        os.system("python \"" + win_user.path + "\" \"" + user_data["fname"] + " " + user_data["lname"] + "\" \"" + user_data["department"] + "\"")
+        #win_user.create_user(user_settings, user_data["passw"])
         time.sleep(3.0)
         try:
             print("User:\t" + str(aduser.ADUser.from_cn(user_settings['sAMAccountName'])))
@@ -44,6 +48,7 @@ def user_reg():
         win_user.update_attributes(user_settings['sAMAccountName'], user_settings, user_data['passw'])
         win_user.join_group(user_settings['sAMAccountName'])
         msg = user_data["fname"] + ", your user account: " + user_settings["sAMAccountName"] + " should be created. If not please contact the system administrator."
+        pythoncom.CoUninitialize()
         return render_template("regRes.html", active=1, head_menu=app.config["head_menu"], title="Succes", msg=msg)
     else:
         return render_template("user_reg.html", active=1, head_menu=app.config["head_menu"], form=form)
