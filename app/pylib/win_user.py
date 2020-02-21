@@ -35,9 +35,14 @@ def create_user_settings(user_input):
     passw = user_input["passw"]
     dept = user_input["department"]
     role = user_input["role"]
+    if dept.lower() == 'it':
+        dept = "IT"
+    else:
+        dept = dept[0].upper() + dept[1:].lower()
     sAMAccountName = get_username(fname, lname)
     userPrincipalName = get_userPrincipalName(sAMAccountName)
     return {
+        'company': company,
         'department': dept,
         'description': role,
         'displayName': get_name(fname, lname),
@@ -51,6 +56,7 @@ def create_user_settings(user_input):
         'scriptPath': scriptPath,
         'userPrincipalName': userPrincipalName,
         'sAMAccountName': sAMAccountName,
+        'title': dept,
     } # 'cn' and 'name' keys have been removed as they cause exceptions when being updated.
 
 def create_user(user_settings, password): # Deprecated function
@@ -207,6 +213,61 @@ def split_name(name, index):
     :param index: Index of where to split <name> at <type:int>
     '''
     return name[:index], name[index + 1:]
+
+def loop_addomain(adomain="DC=" + userdomain + ",DC=" + domainsuffix):
+    '''
+    Gets the domain from the Domain Controller to get its children and runs 'loop_domain_children()'\n
+    Arguments:\n
+    :param adomain: DistinguishedName of the domain <type:str>
+    '''
+    try: 
+        domain = addomain.ADDomain.from_dn(adomain)
+    except:
+        return "Unable to get domain from Domain Controller."
+    domain_children = domain.get_children()
+    return loop_domain_children(domain_children)
+
+def loop_domain_children(domain_children):
+    '''
+    Uses recursion to loop through children of the domain object.\n
+    Arguments:\n
+    :param domain_children: Collection of domain_children in the from of a list <type:List>[<type:adobjects>]
+    '''
+    users = []
+    for child in domain_children:
+        if type(child) is pyad.adcontainer.ADContainer:
+            loop = loop_domain_children(child.get_children())
+            #print(type(loop))
+            if type(loop) is not type(None) and type(loop) is list:
+                for l in loop:
+                    users.append(l)
+        elif type(child) is pyad.aduser.ADUser:
+            users.append(child.name)
+    if len(users) > 0:
+        return users
+
+def level_list(l):
+    e = []
+    for i in l:
+        if type(i) is list:
+            entries = level_list(i)
+            for entry in entries:
+                e.append(entry)
+        elif type(i) is str:
+            e.append(i)
+    
+def name_check(name):
+    '''
+    Check name of a new user with current users and objects in AD\n
+    Arguments:\n
+    :param name: Name of new user <type:str>
+    '''
+    usernames = loop_addomain()
+    print(str(usernames))
+    if name in usernames:
+        return False
+    else:
+        return True
     
 
 if __name__=="__main__":
