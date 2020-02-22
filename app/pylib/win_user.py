@@ -4,6 +4,7 @@ from pyad import pyad, aduser, adobject, adgroup, addomain, adcontainer, adcompu
 import os
 import re
 from pathlib import Path
+import datetime
 
 ldap_server = "<server_fqdn>" # Fully qualified domain name of the ldap server
 username = "<accountop_username>" # Account operations account
@@ -29,6 +30,14 @@ def create_user_settings(user_input):
     :keys    \"fname\", \"lname\", \"email\", \"passw\", \"department\", \"role\": <types:str>\n
     :values first name, last name, email, password, department, role <types:str>
     '''
+    vdate = datetime.datetime.now() + datetime.timedelta(weeks=4*6) # Add half a year to create a new team group
+    try:
+        u_group = adgroup.ADGroup.from_cn(str(vdate.year))
+        user_groups.append(u_group)
+    except:
+        ou = adcontainer.ADContainer.from_cn("Teams")
+        u_group = adgroup.ADGroup.create(str(vdate.year), ou, True, "GLOBAL")
+        user_groups.append(u_group)
     fname = user_input["fname"]
     lname = user_input["lname"]
     email = user_input["email"]
@@ -122,7 +131,7 @@ def update_attributes(sAMAccountName, user_settings, password=None):
     #pyad.set_defaults(ldap_server=ldap_server, username=username, password=password)
     return set_attributes
 
-def join_group(sAMAccountName, group_cn=local_admins):
+def join_group(sAMAccountName, group_cn=user_groups):
     '''
     Joins user <sAMAccountName> to a given <group_cn> and returns what groups 
     the user belongs to.\n
@@ -135,15 +144,22 @@ def join_group(sAMAccountName, group_cn=local_admins):
             return ["No or incorrect sAMAccountName and group_cn given: sAMAccountName: " + str(sAMAccountName) + ", group_cn: " + str(group_cn)]
         elif sAMAccountName is None or type(sAMAccountName) is not str:
             return ["No or incorrect sAMAccountName given, got: "  + str(sAMAccountName)]
-        elif group_cn is None or type(group_cn) is not dict:
-            return ["No or incorrect group_cn given, got: " + str(group_cn)]
     except:
         return str(["An error occoured when trying to check input"])
     print("Input arguments are of valid types")
-    user = aduser.ADUser.from_cn(sAMAccountName)
-    group = adgroup.ADGroup.from_cn(group_cn)
-    group.add_members([user])
     user_groups = []
+    user = aduser.ADUser.from_cn(sAMAccountName)
+    if type(group_cn) == (type(None) or  None):
+        for g in sorted(user.get_attribute('memberOf')):
+            user_groups.append(str(adgroup.ADGroup.from_dn(str(g)).cn))
+        return user_groups
+    if type(group_cn) is list:
+        for g in group_cn:
+            group = adgroup.ADGroup.from_cn(g)
+            group.add_members([user])
+    else:
+        group = adgroup.ADGroup.from_cn(group_cn)
+        group.add_members([user])
     for group in sorted(user.get_attribute('memberOf')):
         user_groups.append(str(adgroup.ADGroup.from_dn(str(group)).cn))
     return user_groups
@@ -157,7 +173,7 @@ def get_username(first_name, last_name):
     :param first_name: first name of the user <type:str>\n
     :param last_name:  last name of the user  <type:str>
     '''
-    return str(first_name[0].lower() + "." + last_name.lower())
+    return str(first_name.replace(" ", ".").lower() + "." + last_name.replace(" ", ".").lower())
 
 def get_userPrincipalName(username, topLevelDomain=topLevelDomain):
     '''
@@ -288,7 +304,7 @@ if __name__=="__main__":
         print(str(ou))
         user = aduser.ADUser.create(sAMAccountName, ou, user_data["passw"])
         user = aduser.ADUser.from_cn(sAMAccountName)
-        group = adgroup.ADGroup.from_cn(local_admins)
+        group = adgroup.ADGroup.from_cn(user_groups)
         group.add_members([user])
         print(str(user))
         user.set_user_account_control_setting("DONT_EXPIRE_PASSWD", True)
@@ -308,7 +324,7 @@ if __name__=="__main__":
         print(str(ou))
         user = aduser.ADUser.create(sAMAccountName, ou, None)
         print(str(user))
-        group = adgroup.ADGroup.from_cn(local_admins)
+        group = adgroup.ADGroup.from_cn(user_groups)
         group.add_members([user])
     else:
         print("Usage: win_user.py \"First_name Last_name\" \"Password\" \"Department\" \"Role\" \"Mail\"\nOr: win_user.py \"First_name Last_name\" \"Department\"")

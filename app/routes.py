@@ -38,6 +38,10 @@ def user_reg():
         "passw": form.password.data
         }
         user_settings = win_user.create_user_settings(user_data)
+        if not win_user.name_check(user_settings["sAMAccountName"]):
+            msg = "Your username: " + user_settings["sAMAccountName"]  + " already exists in the Active Directory database. Please contact a system administrator."
+            pythoncom.CoUninitialize()
+            return render_template("regRes.html", active=1, head_menu=app.config["head_menu"], title="Unsuccessful", msg=msg)
         #os.system("python \"" + win_user.path + "\" \"" + user_data["fname"] + " " + user_data["lname"] + "\" \"" + user_data['passw'] + "\" \"" + user_data['department'] + "\" \"" + user_data['role'] + "\" \"" + user_data['email'] + "\"")
         #os.system("python \"" + win_user.path + "\" \"" + user_data["fname"] + " " + user_data["lname"] + "\" \"" + user_data["department"] + "\"")
         #win_user.create_user(user_settings, user_data["passw"])
@@ -45,14 +49,16 @@ def user_reg():
             ou = adcontainer.ADContainer.from_cn(user_data["department"].upper())
         except:
             msg = "An error occoured when getting the organizational unit from the Domain Controller."
+            pythoncom.CoUninitialize()            
             return render_template("regRes.html", active=1, head_menu=app.config["head_menu"], title="Unsuccessful", msg=msg)
         try:
             user = aduser.ADUser.create(user_settings["sAMAccountName"], ou, user_data["passw"])
             time.sleep(3.0)
             print("User:\t" + str(aduser.ADUser.from_cn(user_settings['sAMAccountName'])))
         except:
-            print("Unable to get user from AD")
+            print("Unable to get user from AD, user non existent.")
             msg = "An error occoured when creating the user account " + user_settings["sAMAccountName"] + "."
+            pythoncom.CoUninitialize()
             return render_template("regRes.html", active=1, head_menu=app.config["head_menu"], title="Unsuccessful", msg=msg)
         win_user.update_attributes(user_settings['sAMAccountName'], user_settings, user_data['passw'])
         win_user.join_group(user_settings['sAMAccountName'])
