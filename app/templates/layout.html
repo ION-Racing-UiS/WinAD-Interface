@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="ION Racing Website" />
     <meta name="author" content="ION Racing" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>ION Racing{% block title %}{% endblock %}</title>
     <link rel="icon" href="{{ url_for('static', filename='images/favicon.png') }}" />
     <script type="text/javascript" src="{{ url_for('static', filename='applications/jquery-3.4.1.min.js') }}"></script>

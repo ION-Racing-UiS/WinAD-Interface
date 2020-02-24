@@ -35,6 +35,14 @@ $(document).keydown(function (e) {
 
 // Handles form buttons and returns the form with an AJAX request
 function formSelect(e) {
+    var csrftoken = $('meta[name=csrf-token]').attr('content');
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type)) {
+                xhr.setRequestHeader("X-CSRFToken", csrftoken)
+            }
+        }
+    });
     $.ajax({
         url: "/contact/" + e,
         type: "POST",

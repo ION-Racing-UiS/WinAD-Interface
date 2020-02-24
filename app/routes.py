@@ -68,3 +68,28 @@ def user_reg():
     else:
         return render_template("user_reg.html", active=1, head_menu=app.config["head_menu"], form=form)
 
+@app.route("/systems")
+def systems():
+    return render_template("no.html", active=2, head_menu=app.config["head_menu"])
+
+@app.route("/terms")
+def terms():
+    return render_template("no.html", active=3, head_menu=app.config["head_menu"])
+
+@app.route("/contact")
+def contact():
+    return render_template("contact.html", active=4, head_menu=app.config["head_menu"], url=request.url)
+
+@app.route("/contact/<hostname>")
+def contacthost(hostname):
+    content = render_template("comp_issue.html", hostname=hostname)
+    return render_template("contact.html", active=4, head_menu=app.config["head_menu"], host=content)
+
+@app.route("/login")
+def login():
+    return render_template("no.html", active=5, head_menu=app.config["head_menu"])
+
+@app.route("/contact/<form_type>", methods=["POST"])
+def form_type(form_type):
+    url = StringTools.removeBetween(request.url+str("/"), StringTools.secondLastIndexOf(request.url+str("/"), "/"), StringTools.lastIndexOf(request.url+str("/"), "/"))
+    return render_template(form_type + ".html", url=url)

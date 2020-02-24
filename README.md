@@ -1,5 +1,5 @@
 # DATA Bachelor 244116
- This is the repository for the bachelor thesis on a Web-interface for Windows Active Directory.
+ This is the repository for the bachelor thesis on a Web-interface for Windows Active Directory. This project reqires that [OpenLDAP](https://sourceforge.net/projects/openldapwindows/) is installed.
 
  Below is the Context Problem Solution steps used in development.
 
@@ -39,5 +39,12 @@
                 * Solution: Import pythoncom and call `CoInitialize()`
                     * Context: User is registerd, but not with any attributes.
                     * Problem: Error 500 when creating user from IIS app
-                    * Solution: Create helper process i.e. reg service
+                    * Solution: Run in dev server, import and call `CoInitialize()`
 
+* Context: Duplicate usernames need to be circumvented.
+* Problem: To user with the same username cannot co-exist
+* Solution: Implement a new username policy and do checks for existing username i AD
+
+* Context: Need user login for user management and report writing
+* Problem: Find modules that can offer AD authentication.
+* Solution: Use flask-ldap for authentication.

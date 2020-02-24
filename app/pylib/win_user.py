@@ -20,7 +20,7 @@ userdomain = "<yourdomain>" # Just your domain name, ie. google, not google.com
 domainsuffix = "<suffix>" # What top level domain you have, ie. .com, .net, .eu, dk, .no, .se
 ous = [('<ou_name>', '<Ou_name>'), ('<ou_name2>', '<Ou_name2>')] # Organizational units list for the wtf form <type:list> of <type:tuple> or <type:str> and <type:str>
 path = str(Path(__file__).absolute()) # Absolute path to this file within the filesystem.
-local_admins = "<group_name>" # Group name for users so that they can be local admins
+user_groups = "<group_name>" # Group name for users so that they can be local admins
 
 def create_user_settings(user_input):
     '''
