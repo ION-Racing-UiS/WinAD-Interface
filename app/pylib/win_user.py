@@ -263,6 +263,11 @@ def loop_domain_children(domain_children):
         return users
 
 def level_list(l):
+    '''
+    Loop trough a list with possible nested list and return a single level list.\n
+    Arguments:\n
+    :param l: list with possible nested lists inside <type:list>
+    '''
     e = []
     for i in l:
         if type(i) is list:

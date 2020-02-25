@@ -16,7 +16,6 @@ itsdangerous==1.1.0
 Jinja2==2.10.3
 limits==1.4.1
 MarkupSafe==1.1.1
-mod-wsgi==4.7.0
 mysql-connector-python==8.0.19
 protobuf==3.6.1
 pyad==0.6.0
