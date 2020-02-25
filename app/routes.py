@@ -3,7 +3,7 @@ from werkzeug.utils import secure_filename
 from app import app, limiter
 from app.forms import RegisterForm
 from datetime import datetime
-from app.pylib import win_user
+from app.pylib import win_user, StringTools
 from pyad import pyad, adcontainer, aduser, adgroup, adobject
 import os
 import time
@@ -57,7 +57,7 @@ def user_reg():
             print("User:\t" + str(aduser.ADUser.from_cn(user_settings['sAMAccountName'])))
         except:
             print("Unable to get user from AD, user non existent.")
-            msg = "An error occoured when creating the user account " + user_settings["sAMAccountName"] + "."
+            msg = "An error occoured when creating the user account " + user_settings["sAMAccountName"] + ". If the problem persists, don't include your middle name. Max length is 20 characters including periods."
             pythoncom.CoUninitialize()
             return render_template("regRes.html", active=1, head_menu=app.config["head_menu"], title="Unsuccessful", msg=msg)
         win_user.update_attributes(user_settings['sAMAccountName'], user_settings, user_data['passw'])

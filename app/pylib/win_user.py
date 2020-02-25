@@ -154,9 +154,10 @@ def join_group(sAMAccountName, group_cn=user_groups):
             user_groups.append(str(adgroup.ADGroup.from_dn(str(g)).cn))
         return user_groups
     if type(group_cn) is list:
-        for g in group_cn:
-            group = adgroup.ADGroup.from_cn(g)
-            group.add_members([user])
+        user = aduser.ADUser.from_cn(sAMAccountName)
+        for gr in group_cn:
+            g = adgroup.ADGroup.from_cn(gr)
+            user.add_to_group(g)
     else:
         group = adgroup.ADGroup.from_cn(group_cn)
         group.add_members([user])

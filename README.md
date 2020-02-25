@@ -48,3 +48,6 @@
 * Context: Need user login for user management and report writing
 * Problem: Find modules that can offer AD authentication.
 * Solution: Use flask-ldap for authentication.
+    * Context: Errors when installing flask-ldap
+    * Problem: Something to do with the VS Build Tools or CppWinRT
+    * Solution: ?
