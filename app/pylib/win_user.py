@@ -20,7 +20,8 @@ userdomain = "<yourdomain>" # Just your domain name, ie. google, not google.com
 domainsuffix = "<suffix>" # What top level domain you have, ie. .com, .net, .eu, dk, .no, .se
 ous = [('<ou_name>', '<Ou_name>'), ('<ou_name2>', '<Ou_name2>')] # Organizational units list for the wtf form <type:list> of <type:tuple> or <type:str> and <type:str>
 path = str(Path(__file__).absolute()) # Absolute path to this file within the filesystem.
-user_groups = "<group_name>" # Group name for users so that they can be local admins
+user_groups = ["<group_name1>", "<group_name2>"] # Group name for users so that they can be local admins
+user_groups_d = {1: "<group_name1>", 2: "<group_name2>"} # Dict of groups names for users, works better than the list
 
 def create_user_settings(user_input):
     '''
@@ -131,7 +132,7 @@ def update_attributes(sAMAccountName, user_settings, password=None):
     #pyad.set_defaults(ldap_server=ldap_server, username=username, password=password)
     return set_attributes
 
-def join_group(sAMAccountName, group_cn=user_groups):
+def join_group(sAMAccountName, group_cn=user_groups_d):
     '''
     Joins user <sAMAccountName> to a given <group_cn> and returns what groups 
     the user belongs to.\n
@@ -154,9 +155,13 @@ def join_group(sAMAccountName, group_cn=user_groups):
             user_groups.append(str(adgroup.ADGroup.from_dn(str(g)).cn))
         return user_groups
     if type(group_cn) is list:
-        user = aduser.ADUser.from_cn(sAMAccountName)
-        for gr in group_cn:
-            g = adgroup.ADGroup.from_cn(gr)
+        #user = aduser.ADUser.from_cn(sAMAccountName)
+        for i in range(len(group_cn)):
+            g = adgroup.ADGroup.from_cn(str(group_cn[i]))
+            user.add_to_group(g)
+    elif type(group_cn) is dict:
+        for v in group_cn.values():
+            g = adgroup.ADGroup.from_cn(str(v))
             user.add_to_group(g)
     else:
         group = adgroup.ADGroup.from_cn(group_cn)
