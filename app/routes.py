@@ -9,6 +9,7 @@ import os
 import time
 import pythoncom
 import pywin32_system32
+import re
 
 @app.route("/")
 def landing():
@@ -26,14 +27,26 @@ def home():
 @app.route("/user_reg/")
 @app.route("/user_reg/register", methods=["POST"])
 def user_reg():
+    '''
+    Route for user register page.
+    '''
+    '''Regular expressions to allow all latin characthers and remove two or more sequential spaces.'''
+    text_regexp = '[^\u0041-\u005A\u0061-\u007A\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u024F\u1E00-\u1EFF ]'
+    space_regexp = '\s{2,}'
     form = RegisterForm()
     if form.is_submitted() and form.validate() and form.submit.data:
         pythoncom.CoInitialize()
+        fname = re.sub(space_regexp, "", re.sub(text_regexp, "", form.first_name.data))
+        lname = re.sub(space_regexp, "", re.sub(text_regexp, "", form.last_name.data))
+        if fname[-1] == " ": # Remove trailing spaces at the end
+            fname = fname[0:-1]
+        if lname[-1] == " ": # Remove trailing spaces at the end
+            lname = lname[0:-1]
         user_data={
         "department": form.department.data,
         "role": form.role.data,
-        "fname": form.first_name.data,
-        "lname": form.last_name.data,
+        "fname": fname,
+        "lname": lname,
         "email": form.email.data,
         "passw": form.password.data
         }
