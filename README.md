@@ -1,11 +1,26 @@
 # DATA Bachelor 244116
- This is the repository for the bachelor thesis on a Web-interface for Windows Active Directory. This project reqires that [OpenLDAP](https://sourceforge.net/projects/openldapwindows/) is installed.
+ This is the repository for the bachelor thesis on a Web-interface for Windows Active Directory. This project reqires that `python_ldap` ([See below!](#requirements)) and `flask_ldap` is installed.
+----
+
+## Requirements
+ In order to install all the reqirements for this app it is recommended to run:
+ `<drive_letter>:\<path_to_repo>\>pip install -r requirements.txt` or
+ `<drive_letter>:\<path_to_repo>\>python -m pip install -r requirements.txt`
+
+ Due to issues with installing `python_ldap` on Windows Server 2016 and 2019 with `pip`, I have provided setup wheel file that I found at [lfd.uci.edu](https://www.lfd.uci.edu/~gohlke/pythonlibs/#python-ldap "Link to download page") in the `/_requirements/` folder which can be installed by running:
+ `<drive_letter>:\<path_to_repo>\_requirements\>pip install -r python_ldap-3.2.0-cp37-cp37m-win_amd64.whl` or
+ `<drive_letter>:\<path_to_repo>\_requirements\>python -m pip install -r python_ldap-3.2.0-cp37-cp37m-win_amd64.whl`
 
  Below is the Context Problem Solution steps used in development.
+ * [Sever Configuration](#server-configuration)
+ * [HTTPS](#https)
+ * [User registration](#user-registration)
+ * [User login](#user-login)
+----
 
-# Context Problem Solution
+## Context Problem Solution
 
-# Server Configuration
+### Server Configuration
 
 * Context: Error 500 when trying to connect to the webserver
 * Problem: According to forums this is due to missing permissions for the IIS user account.
@@ -14,13 +29,13 @@
 * Problem: Portnumber 80, 443 and 3306 are blocked firewall or access control lists
 * Solution: Have to contact Theodor Ivesdal about this at a later stage.
 
-# HTTPS
+### HTTPS
 
 * Context: HTTPS/SSL/TLS
 * Problem: IIS Runs HTTP protocol by default
 * Solution: For development, use a self-signed certificate and verify SSL/TLS operation in browser.
 
-# User registration
+### User registration
 
 * Context: User Registration does not function. (Running from IIS server)
 * Problem: Exception is thrown when fetching Organizational Unit from AD
@@ -45,9 +60,11 @@
 * Problem: To user with the same username cannot co-exist
 * Solution: Implement a new username policy and do checks for existing username i AD
 
+### User login
+
 * Context: Need user login for user management and report writing
 * Problem: Find modules that can offer AD authentication.
 * Solution: Use flask-ldap for authentication.
     * Context: Errors when installing flask-ldap
     * Problem: Something to do with the VS Build Tools or CppWinRT
-    * Solution: ?
+    * Solution: Get setup wheel (.whl) file which has the missing file.
