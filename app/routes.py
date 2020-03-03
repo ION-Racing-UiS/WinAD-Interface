@@ -1,15 +1,31 @@
-from flask import render_template, flash, redirect, url_for, request
+from flask import render_template, flash, redirect, url_for, request, g, session
+from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.utils import secure_filename
-from app import app, limiter
-from app.forms import RegisterForm
+from app import app, limiter, login_manager
+from app.forms import RegisterForm, LoginForm
 from datetime import datetime
 from app.pylib import win_user, StringTools
+from app.pylib.auth_user import User
 from pyad import pyad, adcontainer, aduser, adgroup, adobject
+from flask_ldap import ldap
 import os
 import time
 import pythoncom
 import pywin32_system32
 import re
+
+@login_manager.user_loader
+def load_user(id):
+    pythoncom.CoInitialize()
+    try: 
+        get_val = User.get(id)
+        return User.get(id)
+    except:
+        return None
+
+@app.before_request
+def get_current_user():
+    g.user = current_user
 
 @app.route("/")
 def landing():
@@ -98,11 +114,53 @@ def contacthost(hostname):
     content = render_template("comp_issue.html", hostname=hostname)
     return render_template("contact.html", active=4, head_menu=app.config["head_menu"], host=content)
 
-@app.route("/login")
-def login():
-    return render_template("no.html", active=5, head_menu=app.config["head_menu"])
-
 @app.route("/contact/<form_type>", methods=["POST"])
 def form_type(form_type):
     url = StringTools.removeBetween(request.url+str("/"), StringTools.secondLastIndexOf(request.url+str("/"), "/"), StringTools.lastIndexOf(request.url+str("/"), "/"))
     return render_template(form_type + ".html", url=url)
+
+@app.route("/login", methods=["GET", "POST"])
+def login():
+    if current_user.is_authenticated:
+        flash("You are already logged in.")
+        return redirect(url_for("appuser.home"))
+    form = LoginForm()
+    pythoncom.CoInitialize()
+    if request.method == "POST" and form.validate() and form.is_submitted():
+        username = form.username.data
+        password = form.password.data
+        try: # Try to authenticate the user and handle exceptions if they occour
+            User.try_login(username, password)
+        except ldap.INVALID_CREDENTIALS: # Invalid username or password
+            flash("Invalid username or password", "danger")
+            return render_template("login.html", active=5, head_menu=app.config["head_menu"], form=form)
+        except ldap.INVALID_DN_SYNTAX or ldap.INVALID_SYNTAX: # Syntax error
+            flash("Invalid syntax for login", "danger")
+            return render_template("login.html", active=5, head_menu=app.config["head_menu"], form=form)
+        except pyad.invalidResults: # Unable to get the user from ldap_server
+            flash("Invalid username or password", "danger")
+            return render_template("login.html", active=5, head_menu=app.config["head_menu"], form=form)
+        user = User(username)
+        login_user(user)
+        flash("You have been logged in.", 'success')
+        return redirect(url_for("appuser_home"))
+    if form.errors:
+        flash(form.errors, 'danger')
+    return render_template("login.html", active=5, head_menu=app.config["head_menu"], form=form)
+
+@app.route("/logout")
+@login_required
+def logout():
+    if current_user.is_authenticated:
+        flash("You are now logged out.", 'success')
+    logout_user()
+    return redirect(url_for("login"))
+
+@app.route("/appuser_home")
+@login_required
+def appuser_home():
+    return render_template("appuser_home.html", user=current_user)
+
+@app.route("/show/<template_file>")
+def show_template(template_file):
+    return render_template(str(template_file)+".html")

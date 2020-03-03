@@ -4,8 +4,9 @@ from flask_bootstrap import Bootstrap
 from flask_wtf.csrf import CSRFProtect
 from flask_limiter import Limiter
 from flask_limiter.util import get_remote_address
+from flask_ldap import LDAP, login_required
+from flask_login import LoginManager
 from pyad import pyad, aduser, adobject, adgroup, addomain, adcontainer, adcomputer, adquery, adsearch
-from flask.ext.ldap import LDAP, login_required
 from app.pylib import win_user
 import datetime
 import sys
@@ -24,6 +25,9 @@ limiter = Limiter(app, key_func=get_remote_address, default_limits=["60 per minu
 csrf = CSRFProtect(app)
 csrf.init_app(app)
 ldap = LDAP(app)
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = "login"
 
 today = datetime.date.today()
 month = ""

@@ -80,7 +80,7 @@ function setUsername() {
     }
     let fname = document.getElementById("fname").value.replace(reg, "").replace(/\s{2,}/g, " ");
     let lname = document.getElementById("lname").value.replace(reg, "").replace(/\s{2,}/g, " ");
-    let username = fname.toLowerCase().replace("..", ".").replace(" ", ".") + "." + lname.toLowerCase().replace("..", ".").replace(" ", "."); // Creates the username
+    let username = fname.toLowerCase().replace(" ", ".").replace("..", ".") + "." + lname.toLowerCase().replace(" ", ".").replace("..", "."); // Creates the username
     let fullname = fname + " " + lname; // Creates the full name of the user
     document.getElementById("fname").value = fname[0].toUpperCase() + fname.substring(1, fname.length); // Capitalization check
     document.getElementById("lname").value = lname[0].toUpperCase() + lname.substring(1, lname.length); // Capitalization check

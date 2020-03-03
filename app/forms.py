@@ -34,6 +34,7 @@ class RegisterForm(FlaskForm):
     )
     user_name = StringField(
         'Username',
+        validators=[validators.Length(max=20, message="Username cannot be longer than 20 charachters, if you have a middlename you can remove it or use its initial.")],
         render_kw={'placeholder': 'Created by username policy', 'readonly': True},
         id='username'
     )
@@ -57,3 +58,16 @@ class RegisterForm(FlaskForm):
         validators=[validators.DataRequired('You must agree to the terms and conditions')]
     )
     submit = SubmitField('Register User', render_kw={'class': 'btn email-me btn-primary'})
+
+class LoginForm(FlaskForm):
+    username = StringField(
+        'Username', 
+        validators=[validators.DataRequired()],
+        render_kw={'placeholder': 'Username'}
+    )
+    password = PasswordField(
+        'Password',
+        validators=[validators.DataRequired()],
+        render_kw={'placeholder': 'Password'}
+    )
+    login = SubmitField('Log In', render_kw={'class': 'btn email-me btn-primary'})
