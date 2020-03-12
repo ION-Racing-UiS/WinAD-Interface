@@ -52,7 +52,7 @@ except:
 cur_time = datetime.datetime.now()
 cur_time_formatted = str(cur_time.hour) + ":" + str(cur_time.minute) + ":" + str(cur_time.second) # Using hh:mm:ss time format
 cur_date_formatted = str(day) + "." + str(month) + "." + str(year) # Using dd.MM.yyyy date format
-print(str(cur_date_formatted) + "\tStarting flask server, Time:\t" + str(cur_time_formatted))
+print(str("Date: " + cur_date_formatted) + "\tTime: " + str(cur_time_formatted) + "\tStarting flask server")
 
 
 

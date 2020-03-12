@@ -117,14 +117,14 @@ def update_attributes(sAMAccountName, user_settings, password=None):
             return ["No or incorrect user_settings given, got: " + str(user_settings)]
     except:
         return str(["An error occoured when trying to check input"])
-    print("Input arguments are of valid types")
+    #print("Input arguments are of valid types")
     user = aduser.ADUser.from_cn(str(sAMAccountName))
     if type(password) is str and password is not None:
         user.set_password(password)
         #pyad.set_defaults(ldap_server=ldap_server, username=sAMAccountName, password=password)
     user.set_user_account_control_setting("DONT_EXPIRE_PASSWD", True)
     for key in user_settings.keys():
-        print(str(key))
+        #print(str(key))
         user.update_attribute(str(key), str(user_settings[key]))
     set_attributes = []
     for key in user_settings.keys():
@@ -147,7 +147,7 @@ def join_group(sAMAccountName, group_cn=user_groups_d):
             return ["No or incorrect sAMAccountName given, got: "  + str(sAMAccountName)]
     except:
         return str(["An error occoured when trying to check input"])
-    print("Input arguments are of valid types")
+    #print("Input arguments are of valid types")
     user_groups = []
     user = aduser.ADUser.from_cn(sAMAccountName)
     if type(group_cn) == (type(None) or  None):
@@ -290,7 +290,7 @@ def name_check(name):
     :param name: Name of new user <type:str>
     '''
     usernames = loop_addomain()
-    print(str(usernames))
+    #print(str(usernames))
     if name in usernames:
         return False
     else:
@@ -307,23 +307,23 @@ if __name__=="__main__":
             'role': os.sys.argv[4],
             'email': os.sys.argv[5]
         }
-        print(user_data['name'])
+        #print(user_data['name'])
         user_data['fname'], user_data['lname'] = split_name(user_data['name'], get_last_index_of(user_data['name'], charachter=" "))
         user_settings = create_user_settings(user_data)
         sAMAccountName = get_username(user_data['fname'], user_data['lname'])
         ou = adcontainer.ADContainer.from_dn(str("OU=" + user_data["department"].upper() + ", DC=" + userdomain.upper() + ", DC=" + domainsuffix.upper()))
-        print(str(ou))
+        #print(str(ou))
         user = aduser.ADUser.create(sAMAccountName, ou, user_data["passw"])
         user = aduser.ADUser.from_cn(sAMAccountName)
         group = adgroup.ADGroup.from_cn(user_groups)
         group.add_members([user])
-        print(str(user))
+        #print(str(user))
         user.set_user_account_control_setting("DONT_EXPIRE_PASSWD", True)
         for key in user_settings.keys():
-            print(str(key))
+            #print(str(key))
             user.update_attribute(str(key), str(user_settings[key]))
-        print(str(user_data))
-        print(str(user_settings))
+        #print(str(user_data))
+        #print(str(user_settings))
     elif len(os.sys.argv) == 3:
         # Simpler version to create a user account with only 2 arguments (Username and department)
         pyad.set_defaults(ldap_server=ldap_server, username=username, password=None)
@@ -332,9 +332,9 @@ if __name__=="__main__":
         sAMAccountName = get_username(fname, lname)
         department = os.sys.argv[2]
         ou = adcontainer.ADContainer.from_dn(str("OU=" + department.upper() + ",DC=" + userdomain.upper() + ",DC=" + domainsuffix.upper()))
-        print(str(ou))
+        #print(str(ou))
         user = aduser.ADUser.create(sAMAccountName, ou, None)
-        print(str(user))
+        #print(str(user))
         group = adgroup.ADGroup.from_cn(user_groups)
         group.add_members([user])
     else:
