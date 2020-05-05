@@ -138,9 +138,9 @@ def user_reg():
         pythoncom.CoInitialize()
         fname = re.sub(space_regexp, "", re.sub(text_regexp, "", form.first_name.data))
         lname = re.sub(space_regexp, "", re.sub(text_regexp, "", form.last_name.data))
-        if fname[-1] == " ": # Remove trailing spaces at the end
+        while fname[-1] == " ": # Remove trailing spaces at the end
             fname = fname[0:-1]
-        if lname[-1] == " ": # Remove trailing spaces at the end
+        while lname[-1] == " ": # Remove trailing spaces at the end
             lname = lname[0:-1]
         user_data={
         "department": form.department.data,
