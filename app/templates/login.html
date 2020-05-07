@@ -7,8 +7,8 @@
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles/contact.css') }}" />
     <div class="row">
         <div class="col-xs-12 col-md-8">
-            <h1>Register for a new user.</h1>
-            <p>This form will make domain user creation easier. All fields is required to make an account.</p>
+            <h1>User login.</h1>
+            <p>Please use your Windows Active Directory User credentials to login.</p>
         </div>
         <form id="user_reg" name="user_reg" method="POST" action="/login">
             {{ form.csrf_token }}

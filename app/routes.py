@@ -138,6 +138,13 @@ def user_reg():
         pythoncom.CoInitialize()
         fname = re.sub(space_regexp, "", re.sub(text_regexp, "", form.first_name.data))
         lname = re.sub(space_regexp, "", re.sub(text_regexp, "", form.last_name.data))
+        if len(fname) == 0 or len(lname) == 0:
+            msg = "Invalid input data in first or last name."
+            pythoncom.CoUninitialize()
+            data = "Failed user registration due to wrong input data in either fname or lname."
+            res = build_log(data)
+            print(res)
+            return render_template("regRes.html", active=1, head_menu=app.config["head_menu"], title="Unsuccessful", msg=msg)
         while fname[-1] == " ": # Remove trailing spaces at the end
             fname = fname[0:-1]
         while lname[-1] == " ": # Remove trailing spaces at the end
@@ -173,7 +180,7 @@ def user_reg():
             user = aduser.ADUser.create(user_settings["sAMAccountName"], ou, user_data["passw"])
             time.sleep(1.5)
             #user = aduser.ADUser.from_cn(user_settings["sAMAccountName"])
-            print("User:\t" + str(aduser.ADUser.from_cn(user_settings['sAMAccountName'])))
+            print("New User:\t" + str(aduser.ADUser.from_cn(user_settings['sAMAccountName'])))
         except:
             #print("Unable to get user from AD, user non existent.")
             msg = "An error occoured when creating the user account " + user_settings["sAMAccountName"] + ". If the problem persists, don't include your middle name. Max length is 20 characters including periods."
@@ -184,6 +191,7 @@ def user_reg():
         win_user.join_group(user_settings['sAMAccountName'])
         pythoncom.CoUninitialize()
         res = build_log("New User created: " + user_settings["sAMAccountName"] + " created successfully.")
+        print(res)
         msg = user_data["fname"] + ", your user account: " + user_settings["sAMAccountName"] + " should be created. If not please contact the system administrator."
         return render_template("regRes.html", active=1, head_menu=app.config["head_menu"], title="Succes", msg=msg)
     else:
@@ -247,9 +255,9 @@ def login():
             res = build_log("Invalid syntax for login, user: " + username)
             return render_template("login.html", active=5, head_menu=app.config["head_menu"], form=form)
         user = User(username)
-        print("User: " + str(user))
+        #print("User: " + str(user))
         login_user(user)
-        print("Current_user: " + str(current_user) + ", is_auth: " + str(current_user.is_authenticated))
+        #print("Current_user: " + str(current_user) + ", is_auth: " + str(current_user.is_authenticated))
         flash("You have been logged in.", 'success')
         res = build_log("Successful login for: " + username)
         print(res)
