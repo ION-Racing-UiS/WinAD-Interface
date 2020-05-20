@@ -93,6 +93,9 @@ def build_log(data=None):
     return res + str(data)
 
 def route_log():
+    '''
+    Sends info from the request object as well as date/time info to be appended to the log file `app\\__logs__\\filename.txt`, and returns the resulting string.
+    '''
     remote_info = get_remote_info(request)
     req_time = get_date_time()
     res = remote_info["ip"] + " - - " + req_time + " " + remote_info["method"] + " " + remote_info["url"] + " Requested"
