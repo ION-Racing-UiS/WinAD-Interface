@@ -1,0 +1,29 @@
+body {
+    background-color: #444;
+    color: #FFFFFF;
+    padding: 0;
+    margin: 0;
+}
+
+header {
+    background-color: #222;
+    height: 50px;
+    color: #FFFFFF;
+}
+
+main {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: wrap;
+}
+
+.side-menu {
+    background-color: #000;
+    width: 20%;
+    color: #FFFFFF;
+}
+
+#content {
+    background-color: #444;
+    color: #FFFFFF;
+}

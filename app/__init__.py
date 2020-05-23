@@ -45,9 +45,9 @@ log_name = "u_ex" + year + month + day+".txt"
 #print(str(Path(__file__) + "__logs__\\")
 filename = str(os.path.abspath(os.getcwd())) + "\\app\\__logs__\\" + log_name
 try:
-    sys.stdout = open(filename, 'a')
+    sys.stdout = open(filename, 'a') # Append to file if exists
 except:
-    sys.stdout = open(filename, 'w+')
+    sys.stdout = open(filename, 'w+') # Create new file and write to it.
 
 cur_time = datetime.datetime.now()
 cur_time_formatted = str(cur_time.hour) + ":" + str(cur_time.minute) + ":" + str(cur_time.second) # Using hh:mm:ss time format
