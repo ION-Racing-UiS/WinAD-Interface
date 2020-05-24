@@ -2,7 +2,7 @@ from flask import render_template, flash, redirect, url_for, request, g, session
 from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.utils import secure_filename
 from app import app, limiter, login_manager
-from app.forms import RegisterForm, LoginForm
+from app.forms import RegisterForm, LoginForm, UserEdit, UserOldPwd, UserChangePwd
 from datetime import datetime
 from app.pylib import win_user, StringTools
 from app.pylib.auth_user import User
@@ -283,6 +283,80 @@ def appuser_home():
     route_log()
     res = build_log("/appuser_home/ current_user: " + str(current_user) + ", is_auth? " + str(current_user.is_authenticated))
     return render_template("appuser_home.html", user=current_user)
+
+@app.route("/gohome")
+@login_required
+def gohome():
+    route_log()
+    if current_user.is_authenticated:
+        flash("You are now logged out.", 'success')
+    logout_user()
+    return redirect(url_for("home"))
+
+@app.route("/appuser_edit", methods=["POST", "GET"])
+@login_required
+def appuser_edit():
+    route_log()
+    pythoncom.CoInitialize()
+    adu = current_user.u
+    #form = UserEdit(adu.givenName, adu.sn, adu.displayName, adu.description, adu.mail)
+    form = UserEdit()
+    if request.method == "POST" and form.validate() and form.is_submitted():
+        givenName = form.givenName.data
+        sn = form.sn.data
+        displayName = form.displayName.data
+        description = form.description.data
+        mail = form.mail.data
+        if givenName is not None and len(givenName) > 0:
+            adu.update_attribute('givenName', givenName)
+        if sn is not None and len(sn) > 0:
+            adu.update_attribute('sn', sn)
+        if displayName is not None and len(displayName) > 0:
+            adu.update_attribute('displayName', displayName)
+        if description is not None and len(description) > 0:
+            adu.update_attribute('description', description)
+        if mail is not None and len(mail) > 0:
+            adu.update_attribute('mail', mail)
+        return redirect(url_for("appuser_home"))
+    form.givenName.data = adu.givenName
+    form.sn.data = adu.sn
+    form.displayName.data = adu.displayName
+    form.description.data = adu.description
+    form.mail.data = adu.mail
+    return render_template("appuser_edit.html", user=current_user, form=form)
+
+@app.route("/appuser_password", methods=["POST", "GET"])
+@login_required
+def appuser_password():
+    route_log()
+    pythoncom.CoInitialize()
+    adu = current_user.u
+    if request.method == "GET":
+        form = UserOldPwd()
+        form.stage.data = 1
+        form.username.data = adu.cn
+        return render_template("appuser_password.html", form=form)
+    elif request.method == "POST" and form.stage.data > 0 and form.validate():
+        username = form.username.data
+        password = form.password.data
+        try: 
+            User.try_login(username, password)
+        except ldap.INVALID_CREDENTIALS: # Invalid username or password
+            flash("Invalid username or password", "danger")
+            res = build_log("Invalid user credentials for: " + username)
+            print(res)
+            return redirect(url_for('appuser_password'))
+        except ldap.INVALID_DN_SYNTAX or ldap.INVALID_SYNTAX: # Syntax error
+            flash("Invalid syntax for login", "danger")
+            res = build_log("Invalid syntax for login, user: " + username)
+            print(res)
+            return redirect(url_for('appuser_password'))
+        except pyad.invalidResults: # Unable to get the user from ldap_server
+            flash("Invalid username or password", "danger")
+            res = build_log("Invalid syntax for login, user: " + username)
+            return redirect(url_for('appuser_password'))
+
+
 
 @app.route("/show/<template_file>")
 def show_template(template_file):

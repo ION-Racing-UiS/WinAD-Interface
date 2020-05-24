@@ -33,12 +33,13 @@ def create_user_settings(user_input):
     '''
     vdate = datetime.datetime.now() + datetime.timedelta(weeks=4*6) # Add half a year to create a new team group
     try:
-        u_group = adgroup.ADGroup.from_cn(str(vdate.year))
-        user_groups.append(u_group)
-    except:
         ou = adcontainer.ADContainer.from_cn("Teams")
         u_group = adgroup.ADGroup.create(str(vdate.year), ou, True, "GLOBAL")
         user_groups.append(u_group)
+    except:
+        u_group = adgroup.ADGroup.from_cn(str(vdate.year))
+        user_groups.append(u_group)
+        
     fname = user_input["fname"]
     lname = user_input["lname"]
     email = user_input["email"]
