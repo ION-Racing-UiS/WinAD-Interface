@@ -331,14 +331,16 @@ def appuser_password():
     route_log()
     pythoncom.CoInitialize()
     adu = current_user.u
+    old_form = UserOldPwd()
+    new_form = UserChangePwd()
     if request.method == "GET":
-        form = UserOldPwd()
-        form.stage.data = 1
-        form.username.data = adu.cn
+        old_form.stage.data = 1
+        new_form.stage.data = 1
+        old_form.username.data = adu.cn
         return render_template("appuser_password.html", form=form)
-    elif request.method == "POST" and form.stage.data > 0 and form.validate():
-        username = form.username.data
-        password = form.password.data
+    elif request.method == "POST" and old_form.stage.data == 1 and old_form.validate():
+        username = old_form.username.data
+        password = old_form.password.data
         try: 
             User.try_login(username, password)
         except ldap.INVALID_CREDENTIALS: # Invalid username or password
@@ -355,6 +357,9 @@ def appuser_password():
             flash("Invalid username or password", "danger")
             res = build_log("Invalid syntax for login, user: " + username)
             return redirect(url_for('appuser_password'))
+        old_form.stage.data = 2
+        old_form.stage.data = 2
+        return render_template("appuser_passwordchange.html")
 
 
 
