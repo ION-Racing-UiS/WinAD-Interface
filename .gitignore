@@ -12,3 +12,4 @@ app\__logs__\*.*
 app/__logs__/*
 app\__logs__\*
 *.bat
+*.pem
