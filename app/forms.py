@@ -76,14 +76,17 @@ class LoginForm(FlaskForm):
 class UserEdit(FlaskForm):
     givenName = StringField(
         'First Name',
+        validators=[validators.DataRequired("Cannot be empty.")],
         render_kw={'placeholder': 'First Name'}
     )
     sn = StringField(
         'Last Name',
+        validators=[validators.DataRequired("Cannot be empty.")],
         render_kw={'placeholder': 'Last Name'}
     )
     displayName = StringField(
         'Display Name',
+        validators=[validators.DataRequired("Cannot be empty.")],
         render_kw={'placeholder': 'Display Name'}
     )
     description = StringField(
@@ -128,7 +131,6 @@ class UserEdit(FlaskForm):
         apply = SubmitField('Apply', render_kw={'class': 'btn btn-primary'})'''
 
 class UserOldPwd(FlaskForm):
-    stage = HiddenField('Stage')
     username = HiddenField('Username')
     password = PasswordField(
         'Current Password',
@@ -138,17 +140,15 @@ class UserOldPwd(FlaskForm):
     proceed = SubmitField('Proceed', render_kw={'class': 'btn'})
 
 class UserChangePwd(FlaskForm):
-    stage = HiddenField(
-        'Stage'
-    )
+    username = HiddenField('Username')
     password = PasswordField(
         'New Password',
         validators=[validators.Length(min=3, max=128, message="Your password must meet the minimum requirements!")],
         render_kw={'placeholder': 'New Password'}
     )
     confirm_password = PasswordField(
-        'Conform Password',
-        validators=[validators.EqualTo('New Password', message="The passwords must match!")],
+        'Confirm Password',
+        validators=[validators.EqualTo('password', message="The passwords must match!")],
         render_kw={'placeholder': 'Retype New Password'}
     )
     change = SubmitField('Change Password', render_kw={'class': 'btn'})

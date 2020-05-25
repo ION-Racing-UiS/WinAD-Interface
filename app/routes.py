@@ -329,39 +329,52 @@ def appuser_edit():
 @login_required
 def appuser_password():
     route_log()
-    pythoncom.CoInitialize()
+    #pythoncom.CoInitialize()
     adu = current_user.u
     old_form = UserOldPwd()
     new_form = UserChangePwd()
+    try: 
+        print("Change_Pwd_Stage: " + str(session["change_pwd_stage"]))
+    except:
+        print("Change_Pwd_stage: " + str(0))
     if request.method == "GET":
-        old_form.stage.data = 1
-        new_form.stage.data = 1
+        session["change_pwd_stage"] = 0
         old_form.username.data = adu.cn
-        return render_template("appuser_password.html", form=form)
-    elif request.method == "POST" and old_form.stage.data == 1 and old_form.validate():
-        username = old_form.username.data
-        password = old_form.password.data
-        try: 
-            User.try_login(username, password)
-        except ldap.INVALID_CREDENTIALS: # Invalid username or password
-            flash("Invalid username or password", "danger")
-            res = build_log("Invalid user credentials for: " + username)
-            print(res)
-            return redirect(url_for('appuser_password'))
-        except ldap.INVALID_DN_SYNTAX or ldap.INVALID_SYNTAX: # Syntax error
-            flash("Invalid syntax for login", "danger")
-            res = build_log("Invalid syntax for login, user: " + username)
-            print(res)
-            return redirect(url_for('appuser_password'))
-        except pyad.invalidResults: # Unable to get the user from ldap_server
-            flash("Invalid username or password", "danger")
-            res = build_log("Invalid syntax for login, user: " + username)
-            return redirect(url_for('appuser_password'))
-        old_form.stage.data = 2
-        old_form.stage.data = 2
-        return render_template("appuser_passwordchange.html")
-
-
+        return render_template("appuser_password.html", form=old_form, user=session["change_pwd_stage"])
+    elif request.method == "POST":
+        if new_form.is_submitted() and new_form.validate():
+            password = new_form.password.data
+            confirm_password = new_form.confirm_password.data
+            if password == confirm_password:
+                u = aduser.ADUser.from_cn(adu.cn)
+                u.set_password(password)
+                session["change_pwd_stage"] = 0
+                return redirect(url_for('appuser_home'))
+            else:
+                flash("The passwords does not match, please try again.")
+                return redirect(url_for('appuser_password'))
+        elif old_form.is_submitted() and old_form.validate():
+            username = old_form.username.data
+            password = old_form.password.data
+            try: 
+                User.try_login(adu.cn, password)
+            except ldap.INVALID_CREDENTIALS: # Invalid username or password
+                flash("Invalid username or password: INVALID_CREDENTIALS", "danger")
+                res = build_log("Invalid user credentials for: " + adu.cn)
+                print(res)
+                return redirect(url_for('appuser_password'))
+            except ldap.INVALID_DN_SYNTAX or ldap.INVALID_SYNTAX: # Syntax error
+                flash("Invalid syntax for login", "danger")
+                res = build_log("Invalid syntax for login, user: " + adu.cn)
+                print(res)
+                return redirect(url_for('appuser_password'))
+            except pyad.invalidResults: # Unable to get the user from ldap_server
+                flash("Invalid username or password: invalidResults", "danger")
+                res = build_log("Invalid syntax for login, user: " + adu.cn)
+                return redirect(url_for('appuser_password'))
+            session["change_pwd_stage"] = 1
+            new_form.username.data = adu.cn
+            return render_template("appuser_password.html", form=new_form, user=session["change_pwd_stage"])
 
 @app.route("/show/<template_file>")
 def show_template(template_file):
