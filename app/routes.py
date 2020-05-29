@@ -8,6 +8,7 @@ from app.pylib import win_user, StringTools
 from app.pylib.auth_user import User
 from pyad import pyad, adcontainer, aduser, adgroup, adobject
 from flask_ldap import ldap
+from markdown import markdown
 import os
 import time
 import pythoncom
@@ -353,9 +354,10 @@ def appuser_password():
                 u = aduser.ADUser.from_cn(adu.cn)
                 u.set_password(password)
                 session["change_pwd_stage"] = 0
+                flash("Your password has been changed!", "success")
                 return redirect(url_for('appuser_home'))
             else:
-                flash("The passwords does not match, please try again.")
+                flash("The passwords does not match, please try again.", "error")
                 return redirect(url_for('appuser_password'))
         elif old_form.is_submitted() and old_form.validate():
             username = old_form.username.data
@@ -383,6 +385,18 @@ def appuser_password():
             session["change_pwd_stage"] = 1
             new_form.username.data = adu.cn
             return render_template("appuser_password.html", form=new_form, user=session["change_pwd_stage"])
+
+@app.route("/appuser_reportedit")            
+@login_required
+def appuser_reportedit():
+    route_log()
+    return render_template("appuser_reportedit.html")
+
+@app.route("/appuser_reportonchange", methods=["POST"])
+def appuser_reportonchange():
+    request.
+    print(data)
+    return "Change Detected!"
 
 @app.route("/show/<template_file>")
 def show_template(template_file):
