@@ -254,6 +254,10 @@ def login():
             flash("Invalid username or password", "danger")
             res = build_log("Invalid syntax for login, user: " + username)
             return render_template("login.html", active=5, head_menu=app.config["head_menu"], form=form)
+        except ldap.SERVER_DOWN: # Unable to contact dc
+            flash("The Domain Controller could not be contacted at this time, please try again later.")
+            res = build_log("Domain Controller could no be contacted!")
+            return redirect(url_for('appuser_password'))
         user = User(username)
         #print("User: " + str(user))
         login_user(user)
@@ -371,6 +375,10 @@ def appuser_password():
             except pyad.invalidResults: # Unable to get the user from ldap_server
                 flash("Invalid username or password: invalidResults", "danger")
                 res = build_log("Invalid syntax for login, user: " + adu.cn)
+                return redirect(url_for('appuser_password'))
+            except ldap.SERVER_DOWN: # Unable to contact dc
+                flash("The Domain Controller could not be contacted at this time, please try again later.")
+                res = build_log("Domain Controller could no be contacted!")
                 return redirect(url_for('appuser_password'))
             session["change_pwd_stage"] = 1
             new_form.username.data = adu.cn
